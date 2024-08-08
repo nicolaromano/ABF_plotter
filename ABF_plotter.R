@@ -20,6 +20,42 @@ print_ABF_file_info <- function(recorting) {
     cat("\n")
 }
 
+reduce_data <- function(data, max_points=2000) {
+    #' Reduces the number of points in a data frame for plotting
+    #' We want to keep the overall shape of the data, so we use a sliding window of size
+    #' 2 * total_points / max_points and take the min and max values
+    #' This will reduce the number of points to approximately max_points
+    #' @param data the data frame
+    #' @return a reduced data frame
+    
+    data <- unlist(data)
+    total_points <- length(data)
+    # Make sure the data is a multiple of max_points, otherwise pad with NA
+    if (total_points %% max_points != 0) {
+        data <- c(data, rep(NA, max_points - (total_points %% max_points)))
+        total_points <- length(data)
+    }
+
+    window_size <- as.integer(2 * total_points %/% max_points)
+    
+    if (window_size < 2) {
+        window_size <- 2
+    }
+
+    steps <- data.frame(From = seq(1, total_points, by = window_size))
+    steps$To <- c(steps$From[-1] - 1, total_points)
+        
+    m <- matrix(data, ncol = window_size, byrow = TRUE)  
+
+    minima <- apply(m, 1, min)
+    maxima <- apply(m, 1, max)
+    
+    reduced_data <- c(rbind(minima, maxima))
+    reduced_data <- reduced_data[1:max_points]
+
+    return(reduced_data)
+}
+
 plot_ABF_data <- function(
     recording, sweep = 1, channel = 1, time_from = 0, time_to = 100,
     highlight_x_range = NULL, highlight_y_range = NULL, highlight_color = "lightgrey") {
@@ -68,9 +104,13 @@ plot_ABF_data <- function(
     channelNames <- paste(recording$channelNames, recording$channelUnits, sep = "-")
     colnames(data) <- channelNames
 
+    if (nrow(data) > 2000) { # We don't want to plot too many points, as it slows down rendering
+       data <- data.frame(sapply(data, reduce_data, 2000))
+       colnames(data) <- channelNames
+    }
+    
     # Note we're using seconds here, rather than points!
-    data$Time <- seq(time_from, time_to, length.out = nrow(data))
-
+    data$Time <- seq(time_from, time_to, length.out = nrow(data))    
     # See vignette("ggplot2-in-packages") for more information on the .data pronoun
     # This is the recommended way to access string column names in ggplot2,
     # as of version 3.0.0, rather than aes_string
