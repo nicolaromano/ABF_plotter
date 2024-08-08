@@ -1,4 +1,4 @@
-library(ABF_plotter)
+library(readABF)
 
 source("ABF_plotter.R")
 
