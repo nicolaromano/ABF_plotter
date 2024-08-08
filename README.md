@@ -2,18 +2,18 @@
 
 This simple script allows plotting data from ABF files using ggplot.
 
-## Requirements
+## Required packages
 
-- R
 - ggplot2
 - readABF
 
+(install with `install.packages(c("ggplot2", "readABF"))`)
+
 ## Usage
 
-1. Download the script from [this repository](https://github.com/nicolaromano/ABF_plotter/tree/main).
-2. Create a new R script in the same directory as the ABF_plotter.R script.
-3. Load the ABF_plotter.R script in your R script using the `source()` function and read the ABF file using the `readABF()` function from the `readABF` package.
-
+1. Download the `ABF_plotter.R` script from [this repository](https://github.com/nicolaromano/ABF_plotter/tree/main).
+2. Create a new R script in the same directory as the `ABF_plotter.R` script.
+3. Load the `ABF_plotter.R` script in your R script using the `source()` function and read the ABF file using the `readABF()` function from the `readABF` package.
 
 ```r
 library(readABF)
