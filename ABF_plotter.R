@@ -57,8 +57,7 @@ reduce_data <- function(data, max_points=2000) {
 }
 
 plot_ABF_data <- function(
-    recording, sweep = 1, channel = 1, time_from = 0, time_to = 100,
-    highlight_x_range = NULL, highlight_y_range = NULL, highlight_color = "lightgrey") {
+    recording, sweep = 1, channel = 1, time_from = 0, time_to = 100, reset_time = FALSE, highlight_x_range = NULL, highlight_y_range = NULL, highlight_color = "lightgrey") {
     #' Plots the data from an ABF file
     #' @param recording the ABF file
     #' @param sweep the sweep to plot
@@ -108,9 +107,15 @@ plot_ABF_data <- function(
        data <- data.frame(sapply(data, reduce_data, 2000))
        colnames(data) <- channelNames
     }
+
+    # Remove any NA values
+    data <- na.omit(data)
     
     # Note we're using seconds here, rather than points!
-    data$Time <- seq(time_from, time_to, length.out = nrow(data))    
+    data$Time <- seq(time_from, time_to, length.out = nrow(data))
+    if (reset_time) {
+        data$Time <- data$Time - time_from
+    }
     # See vignette("ggplot2-in-packages") for more information on the .data pronoun
     # This is the recommended way to access string column names in ggplot2,
     # as of version 3.0.0, rather than aes_string
